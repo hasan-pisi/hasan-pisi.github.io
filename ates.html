@@ -3,36 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DilhunFM</title>
+  <title>Şömine Sahnesi</title>
   <style>
     body {
       margin: 0;
-      background-color: #111;
-      color: #fff;
+      padding: 0;
       font-family: sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
+      background-color: #000;
+      color: #fff;
+      overflow: hidden;
     }
 
-    .video-container {
-      width: 80%;
-      max-width: 800px;
-      position: relative;
-    }
-
-    video {
-      width: 100%;
-      border-radius: 10px;
+    .background-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: -1;
     }
 
     .controls {
-      margin-top: 15px;
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
       display: flex;
       flex-wrap: wrap;
-      justify-content: center;
       gap: 10px;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 15px;
+      border-radius: 10px;
     }
 
     button {
@@ -49,43 +53,39 @@
     }
 
     .volume-slider {
-      width: 200px;
+      width: 150px;
     }
 
     .status {
       margin-top: 10px;
+      text-align: center;
       font-size: 14px;
     }
 
     @media (max-width: 768px) {
-      body {
-        padding: 10px;
-        font-size: 14px;
-      }
-
-      .video-container {
-        width: 100%;
-      }
-
       .controls {
         flex-direction: column;
-        align-items: center;
+        width: 90%;
+        left: 5%;
+        transform: none;
       }
 
       .volume-slider {
         width: 80%;
+      }
+
+      button {
+        width: 100%;
       }
     }
   </style>
 </head>
 <body>
 
-  <div class="video-container">
-    <video id="fireVideo" autoplay muted loop>
-      <source src="ates.mp4" type="video/mp4">
-      Tarayıcınız video etiketini desteklemiyor.
-    </video>
-  </div>
+  <video class="background-video" autoplay muted loop>
+    <source src="ates.mp4" type="video/mp4">
+    Tarayıcınız video etiketini desteklemiyor.
+  </video>
 
   <div class="controls">
     <button id="playPauseBtn">Durdur</button>
@@ -96,16 +96,24 @@
   <div class="status" id="statusText">Ses: %50</div>
 
   <audio id="radioStream" src="http://radyoserver60.okeylisans.com:9314/;" preload="none"></audio>
+  <audio id="clickSound" src="tik.mp3" preload="auto"></audio>
 
   <script>
-    const video = document.getElementById('fireVideo');
     const playPauseBtn = document.getElementById('playPauseBtn');
     const radioBtn = document.getElementById('radioBtn');
     const radio = document.getElementById('radioStream');
     const volumeSlider = document.getElementById('volumeSlider');
     const statusText = document.getElementById('statusText');
+    const clickSound = document.getElementById('clickSound');
+    const video = document.querySelector('.background-video');
+
+    function playClickSound() {
+      clickSound.currentTime = 0;
+      clickSound.play();
+    }
 
     playPauseBtn.addEventListener('click', () => {
+      playClickSound();
       if (video.paused) {
         video.play();
         playPauseBtn.textContent = 'Durdur';
@@ -116,6 +124,7 @@
     });
 
     radioBtn.addEventListener('click', () => {
+      playClickSound();
       if (radio.paused) {
         radio.play();
         radioBtn.textContent = 'Radyo Kapat';
@@ -131,14 +140,9 @@
     });
 
     // Dokunmatik destek (mobil)
-    playPauseBtn.addEventListener('touchstart', e => {
-      e.preventDefault();
-      playPauseBtn.click();
-    });
-
-    radioBtn.addEventListener('touchstart', e => {
-      e.preventDefault();
-      radioBtn.click();
+    ['touchstart'].forEach(evt => {
+      playPauseBtn.addEventListener(evt, e => { e.preventDefault(); playPauseBtn.click(); });
+      radioBtn.addEventListener(evt, e => { e.preventDefault(); radioBtn.click(); });
     });
   </script>
 
