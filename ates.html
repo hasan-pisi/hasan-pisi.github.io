@@ -7,7 +7,6 @@
   <style>
     body {
       margin: 0;
-      padding: 0;
       font-family: sans-serif;
       background-color: #000;
       color: #fff;
@@ -25,31 +24,30 @@
     }
 
     .controls {
-      position: absolute;
+      position: fixed;
       top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
+      left: 20px;
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
       gap: 10px;
-      justify-content: center;
-      align-items: center;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0.6);
       padding: 15px;
       border-radius: 10px;
+      z-index: 10;
     }
 
     button {
       padding: 10px 20px;
-      background-color: #333;
+      background-color: #222;
       color: #fff;
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      font-size: 14px;
     }
 
     button:hover {
-      background-color: #555;
+      background-color: #444;
     }
 
     .volume-slider {
@@ -57,17 +55,17 @@
     }
 
     .status {
-      margin-top: 10px;
+      font-size: 13px;
       text-align: center;
-      font-size: 14px;
     }
 
     @media (max-width: 768px) {
       .controls {
-        flex-direction: column;
         width: 90%;
         left: 5%;
-        transform: none;
+        top: 10px;
+        flex-direction: column;
+        align-items: center;
       }
 
       .volume-slider {
@@ -82,7 +80,7 @@
 </head>
 <body>
 
-  <video class="background-video" autoplay muted loop>
+  <video class="background-video" id="fireVideo" autoplay muted loop playsinline>
     <source src="ates.mp4" type="video/mp4">
     Tarayıcınız video etiketini desteklemiyor.
   </video>
@@ -91,39 +89,40 @@
     <button id="playPauseBtn">Durdur</button>
     <button id="radioBtn">Radyo Aç</button>
     <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="0.5">
+    <div class="status" id="statusText">Ses: %50</div>
   </div>
-
-  <div class="status" id="statusText">Ses: %50</div>
 
   <audio id="radioStream" src="http://radyoserver60.okeylisans.com:9314/;" preload="none"></audio>
   <audio id="clickSound" src="tik.mp3" preload="auto"></audio>
 
   <script>
+    const video = document.getElementById('fireVideo');
     const playPauseBtn = document.getElementById('playPauseBtn');
     const radioBtn = document.getElementById('radioBtn');
     const radio = document.getElementById('radioStream');
     const volumeSlider = document.getElementById('volumeSlider');
     const statusText = document.getElementById('statusText');
     const clickSound = document.getElementById('clickSound');
-    const video = document.querySelector('.background-video');
 
     function playClickSound() {
       clickSound.currentTime = 0;
       clickSound.play();
     }
 
-    playPauseBtn.addEventListener('click', () => {
+    function toggleVideo() {
       playClickSound();
-      if (video.paused) {
-        video.play();
-        playPauseBtn.textContent = 'Durdur';
-      } else {
-        video.pause();
-        playPauseBtn.textContent = 'Oynat';
+      if (video.readyState >= 2) {
+        if (video.paused) {
+          video.play();
+          playPauseBtn.textContent = 'Durdur';
+        } else {
+          video.pause();
+          playPauseBtn.textContent = 'Oynat';
+        }
       }
-    });
+    }
 
-    radioBtn.addEventListener('click', () => {
+    function toggleRadio() {
       playClickSound();
       if (radio.paused) {
         radio.play();
@@ -132,17 +131,20 @@
         radio.pause();
         radioBtn.textContent = 'Radyo Aç';
       }
-    });
+    }
+
+    playPauseBtn.addEventListener('click', toggleVideo);
+    radioBtn.addEventListener('click', toggleRadio);
 
     volumeSlider.addEventListener('input', () => {
       radio.volume = volumeSlider.value;
       statusText.textContent = `Ses: %${Math.round(volumeSlider.value * 100)}`;
     });
 
-    // Dokunmatik destek (mobil)
+    // Mobil dokunmatik destek
     ['touchstart'].forEach(evt => {
-      playPauseBtn.addEventListener(evt, e => { e.preventDefault(); playPauseBtn.click(); });
-      radioBtn.addEventListener(evt, e => { e.preventDefault(); radioBtn.click(); });
+      playPauseBtn.addEventListener(evt, e => { e.preventDefault(); toggleVideo(); });
+      radioBtn.addEventListener(evt, e => { e.preventDefault(); toggleRadio(); });
     });
   </script>
 
