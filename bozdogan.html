@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Bozdoğan Türküsü</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: linear-gradient(to bottom, #1a1a1a, #000);
+      color: #eee;
+      font-family: 'Georgia', serif;
+      text-align: center;
+      padding-top: 100px;
+    }
+
+    h1 {
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+
+    .damla {
+      position: absolute;
+      width: 2px;
+      height: 15px;
+      background: #0af;
+      animation: yagmur 2s linear infinite;
+    }
+
+    @keyframes yagmur {
+      0% {
+        top: -20px;
+        transform: translateX(0px);
+      }
+      100% {
+        top: 100vh;
+        transform: translateX(100px); /* Rüzgar yönü */
+      }
+    }
+
+    audio {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Bozdoğan Türküsü</h1>
+  <p>"Bozdoğan’dan esen yel, yüreğimi savurur..."</p>
+
+  <audio controls autoplay loop>
+    <source src="https://github.com/hasan-pisi/hasan-pisi.github.io/blob/main/bozdogan-turkusu.mp3" type="audio/mpeg">
+    Tarayıcınız ses oynatmayı desteklemiyor.
+  </audio>
+
+  <script>
+    function yagmurVeRuzgar() {
+      for (let i = 0; i < 150; i++) {
+        let damla = document.createElement("div");
+        damla.className = "damla";
+        damla.style.left = Math.random() * window.innerWidth + "px";
+        damla.style.animationDuration = (Math.random() * 1 + 1.5) + "s";
+        document.body.appendChild(damla);
+      }
+    }
+
+    yagmurVeRuzgar();
+  </script>
+</body>
+</html>
