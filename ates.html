@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Şömine ve Radyo</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: 'Segoe UI', sans-serif;
+      color: #fff;
+      text-align: center;
+      padding-top: 100px;
+      z-index: 1;
+    }
+
+    #arkaVideo {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      min-width: 100%;
+      min-height: 100%;
+      z-index: -1;
+      object-fit: cover;
+    }
+
+    h1 {
+      text-shadow: 0 0 20px #ff6600;
+    }
+
+    #kontrolKutusu {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px #ff6600;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      z-index: 2;
+    }
+
+    .kontrolBtn {
+      background: linear-gradient(135deg, #ff6600, #cc3300);
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #ff6600;
+      transition: background 0.3s ease;
+      width: 150px;
+    }
+
+    .kontrolBtn:hover {
+      background: linear-gradient(135deg, #ff3300, #aa2200);
+    }
+
+    #sure, #sesGosterge {
+      font-size: 14px;
+      text-shadow: 0 0 10px #000;
+    }
+  </style>
+</head>
+<body>
+  <video autoplay muted loop id="arkaVideo">
+    <source src="C:\Users\Hasan\Downloads/ates.mp4" type="video/mp4">
+    Tarayıcınız video oynatmayı desteklemiyor.
+  </video>
+
+  <h1>Şömine Başında Canlı Radyo 🔊</h1>
+
+  <div id="kontrolKutusu">
+    <button id="oynatBtn" class="kontrolBtn">▶️ Oynat</button>
+    <button id="sesAzaltBtn" class="kontrolBtn">🔉 Ses -</button>
+    <button id="sesArtirBtn" class="kontrolBtn">🔊 Ses +</button>
+    <div id="sesGosterge">Ses: %100</div>
+    <div id="sure">00:00</div>
+  </div>
+
+  <audio id="radyo" src="http://radyoserver60.okeylisans.com:9314/;"></audio>
+  <audio id="tikSes" src="C:\Users\Hasan\Downloads/tik.mp3"></audio> <!-- tıklama sesi dosyası -->
+
+  <script>
+    const radyo = document.getElementById('radyo');
+    const oynatBtn = document.getElementById('oynatBtn');
+    const sesAzaltBtn = document.getElementById('sesAzaltBtn');
+    const sesArtirBtn = document.getElementById('sesArtirBtn');
+    const sure = document.getElementById('sure');
+    const sesGosterge = document.getElementById('sesGosterge');
+    const tikSes = document.getElementById('tikSes');
+
+    let oynuyor = false;
+    let baslangicZamani;
+
+    function tiklaSesCal() {
+      tikSes.currentTime = 0;
+      tikSes.play();
+    }
+
+    oynatBtn.addEventListener('click', () => {
+      tiklaSesCal();
+      if (!oynuyor) {
+        radyo.play();
+        oynuyor = true;
+        oynatBtn.textContent = '⏸️ Durdur';
+        baslangicZamani = Date.now();
+      } else {
+        radyo.pause();
+        oynuyor = false;
+        oynatBtn.textContent = '▶️ Oynat';
+      }
+    });
+
+    sesAzaltBtn.addEventListener('click', () => {
+      tiklaSesCal();
+      radyo.volume = Math.max(0, radyo.volume - 0.1);
+      guncelleSesGosterge();
+    });
+
+    sesArtirBtn.addEventListener('click', () => {
+      tiklaSesCal();
+      radyo.volume = Math.min(1, radyo.volume + 0.1);
+      guncelleSesGosterge();
+    });
+
+    function guncelleSesGosterge() {
+      const yuzde = Math.round(radyo.volume * 100);
+      sesGosterge.textContent = `Ses: %${yuzde}`;
+    }
+
+    setInterval(() => {
+      if (oynuyor) {
+        const gecenMs = Date.now() - baslangicZamani;
+        const saniye = Math.floor(gecenMs / 1000);
+        const dakika = Math.floor(saniye / 60);
+        const kalanSaniye = saniye % 60;
+        sure.textContent = `${String(dakika).padStart(2, '0')}:${String(kalanSaniye).padStart(2, '0')}`;
+      }
+    }, 1000);
+
+    guncelleSesGosterge();
+  </script>
+</body>
+</html>
